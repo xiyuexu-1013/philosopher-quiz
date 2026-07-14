@@ -1,23 +1,326 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-    <meta charset="utf-8">
-    <title>哲学镜像测试</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>50位思想家：寻找你的精神镜像</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; }
-        button { padding: 15px 30px; font-size: 20px; cursor: pointer; }
+        :root {
+            --bg-color: #fcfcfc;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border-color: #eaeaea;
+            --accent-color: #333333;
+            --hover-color: #f0f0f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color); color: var(--text-primary);
+            font-family: "Helvetica Neue", sans-serif; line-height: 1.6;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        #app { width: 100%; max-width: 600px; padding: 20px; }
+        .card { background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .title { font-size: 28px; font-weight: 600; margin-bottom: 16px; }
+        .subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 30px; }
+        .primary-btn { background: var(--accent-color); color: #ffffff; border: none; padding: 14px 32px; border-radius: 30px; font-size: 16px; cursor: pointer; width: 100%; max-width: 250px; transition: 0.2s; }
+        .primary-btn:hover { opacity: 0.85; }
+        .quiz-header { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+        .question-text { font-size: 20px; font-weight: 500; margin-bottom: 30px; text-align: left; }
+        .options-container { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn { background: #ffffff; border: 1px solid var(--border-color); padding: 16px 20px; border-radius: 8px; font-size: 16px; text-align: left; cursor: pointer; transition: 0.2s; }
+        .option-btn:hover { background: var(--hover-color); }
+        .quote { font-size: 18px; font-style: italic; color: var(--accent-color); border-left: 3px solid var(--accent-color); padding-left: 15px; margin: 20px auto; text-align: left; }
+        .meta-info { background: var(--hover-color); padding: 15px; border-radius: 8px; font-size: 14px; margin-bottom: 30px; text-align: left; }
     </style>
 </head>
 <body>
-    <h1>你是哪位思想家？</h1>
-    <p>这是一个极简的测试入口</p>
-    <button onclick="startTest()">开始测试</button>
 
-    <script>
-        function startTest() {
-            alert("这里可以加入你的25道题逻辑！");
-            // 这里你可以写逻辑，或者通过 location.href 跳转
+<div id="app"></div>
+
+<script>
+// --- 数据字典 ---
+const PHILOSOPHER_VECTORS = {
+  苏格拉底: { D1: 9, D2: 8, D3: 7, D4: 9, D5: 3, D6: 9, D7: 9, D8: 5 },
+  柏拉图: { D1: 8, D2: 10, D3: 3, D4: 7, D5: 4, D6: 7, D7: 9, D8: 4 },
+  亚里士多德: { D1: 9, D2: 6, D3: 8, D4: 6, D5: 5, D6: 4, D7: 6, D8: 6 },
+  赫拉克利特: { D1: 6, D2: 5, D3: 4, D4: 8, D5: 6, D6: 7, D7: 9, D8: 3 },
+  巴门尼德: { D1: 9, D2: 7, D3: 3, D4: 7, D5: 2, D6: 5, D7: 8, D8: 2 },
+  毕达哥拉斯: { D1: 8, D2: 8, D3: 5, D4: 5, D5: 4, D6: 3, D7: 6, D8: 4 },
+  伊壁鸠鲁: { D1: 6, D2: 4, D3: 5, D4: 7, D5: 6, D6: 3, D7: 4, D8: 6 },
+  芝诺: { D1: 10, D2: 4, D3: 4, D4: 6, D5: 2, D6: 9, D7: 6, D8: 2 },
+  第欧根尼: { D1: 5, D2: 3, D3: 6, D4: 10, D5: 3, D6: 9, D7: 5, D8: 2 },
+  '马可·奥勒留': { D1: 7, D2: 5, D3: 8, D4: 6, D5: 5, D6: 3, D7: 7, D8: 5 },
+  塞涅卡: { D1: 7, D2: 5, D3: 7, D4: 6, D5: 6, D6: 4, D7: 7, D8: 6 },
+  奥古斯丁: { D1: 6, D2: 9, D3: 4, D4: 5, D5: 8, D6: 5, D7: 8, D8: 7 },
+  墨子: { D1: 6, D2: 7, D3: 9, D4: 4, D5: 6, D6: 6, D7: 3, D8: 9 },
+  孔子: { D1: 7, D2: 7, D3: 8, D4: 4, D5: 5, D6: 3, D7: 5, D8: 7 },
+  孟子: { D1: 5, D2: 9, D3: 7, D4: 5, D5: 8, D6: 5, D7: 5, D8: 9 },
+  荀子: { D1: 8, D2: 4, D3: 8, D4: 5, D5: 3, D6: 6, D7: 4, D8: 4 },
+  老子: { D1: 7, D2: 4, D3: 4, D4: 9, D5: 4, D6: 4, D7: 8, D8: 5 },
+  庄子: { D1: 5, D2: 3, D3: 3, D4: 10, D5: 5, D6: 6, D7: 9, D8: 5 },
+  韩非子: { D1: 9, D2: 3, D3: 9, D4: 6, D5: 2, D6: 8, D7: 4, D8: 2 },
+  王阳明: { D1: 6, D2: 8, D3: 9, D4: 7, D5: 6, D6: 6, D7: 6, D8: 6 },
+  朱熹: { D1: 9, D2: 7, D3: 7, D4: 4, D5: 3, D6: 4, D7: 5, D8: 3 },
+  慧能: { D1: 4, D2: 4, D3: 4, D4: 8, D5: 5, D6: 5, D7: 9, D8: 6 },
+  张载: { D1: 7, D2: 10, D3: 7, D4: 5, D5: 5, D6: 5, D7: 6, D8: 7 },
+  周敦颐: { D1: 8, D2: 8, D3: 4, D4: 5, D5: 4, D6: 3, D7: 8, D8: 4 },
+  康德: { D1: 10, D2: 8, D3: 7, D4: 6, D5: 3, D6: 5, D7: 8, D8: 4 },
+  尼采: { D1: 6, D2: 9, D3: 8, D4: 10, D5: 6, D6: 9, D7: 8, D8: 3 },
+  叔本华: { D1: 7, D2: 3, D3: 3, D4: 7, D5: 5, D6: 7, D7: 9, D8: 5 },
+  海德格尔: { D1: 6, D2: 5, D3: 4, D4: 6, D5: 5, D6: 5, D7: 10, D8: 4 },
+  萨特: { D1: 7, D2: 8, D3: 8, D4: 10, D5: 5, D6: 9, D7: 8, D8: 3 },
+  加缪: { D1: 6, D2: 6, D3: 8, D4: 7, D5: 6, D6: 7, D7: 9, D8: 6 },
+  福柯: { D1: 7, D2: 5, D3: 6, D4: 8, D5: 4, D6: 10, D7: 7, D8: 5 },
+  德里达: { D1: 6, D2: 4, D3: 3, D4: 7, D5: 4, D6: 9, D7: 7, D8: 4 },
+  罗素: { D1: 9, D2: 6, D3: 7, D4: 6, D5: 7, D6: 5, D7: 5, D8: 7 },
+  维特根斯坦: { D1: 9, D2: 5, D3: 4, D4: 6, D5: 3, D6: 8, D7: 7, D8: 3 },
+  克尔凯郭尔: { D1: 5, D2: 7, D3: 4, D4: 8, D5: 8, D6: 6, D7: 9, D8: 6 },
+  胡塞尔: { D1: 9, D2: 6, D3: 4, D4: 5, D5: 3, D6: 4, D7: 6, D8: 4 },
+  弗洛伊德: { D1: 7, D2: 4, D3: 6, D4: 5, D5: 6, D6: 8, D7: 7, D8: 6 },
+  荣格: { D1: 5, D2: 6, D3: 4, D4: 8, D5: 7, D6: 6, D7: 9, D8: 7 },
+  纪伯伦: { D1: 4, D2: 5, D3: 4, D4: 7, D5: 9, D6: 3, D7: 7, D8: 10 },
+  泰戈尔: { D1: 4, D2: 6, D3: 4, D4: 6, D5: 9, D6: 3, D7: 8, D8: 9 },
+  鲁米: { D1: 3, D2: 5, D3: 4, D4: 7, D5: 10, D6: 3, D7: 8, D8: 9 },
+  里尔克: { D1: 5, D2: 5, D3: 4, D4: 6, D5: 8, D6: 4, D7: 9, D8: 7 },
+  博尔赫斯: { D1: 6, D2: 4, D3: 3, D4: 8, D5: 5, D6: 5, D7: 8, D8: 4 },
+  黑塞: { D1: 5, D2: 6, D3: 5, D4: 8, D5: 8, D6: 6, D7: 8, D8: 7 },
+  阿伦特: { D1: 8, D2: 6, D3: 6, D4: 9, D5: 5, D6: 10, D7: 7, D8: 6 },
+  波伏娃: { D1: 7, D2: 8, D3: 7, D4: 10, D5: 6, D6: 8, D7: 6, D8: 5 },
+  阿多诺: { D1: 8, D2: 4, D3: 4, D4: 7, D5: 4, D6: 10, D7: 7, D8: 4 },
+  马尔库塞: { D1: 7, D2: 6, D3: 5, D4: 6, D5: 4, D6: 9, D7: 7, D8: 5 },
+  本雅明: { D1: 6, D2: 5, D3: 3, D4: 7, D5: 6, D6: 7, D7: 8, D8: 6 },
+  塔可夫斯基: { D1: 5, D2: 6, D3: 4, D4: 6, D5: 8, D6: 5, D7: 9, D8: 7 },
+};
+
+const PHILOSOPHER_META = {
+  苏格拉底: { category: '西方古代/古典', tag: '追问之父', work: '《柏拉图对话录》', quote: '未经省察的人生不值得过。' },
+  柏拉图: { category: '西方古代/古典', tag: '理念之王', work: '《理想国》', quote: '灵魂的转向，是从看影子到看光。' },
+  亚里士多德: { category: '西方古代/古典', tag: '中庸之师', work: '《尼各马可伦理学》', quote: '美德是介于两恶之间的黄金中道。' },
+  赫拉克利特: { category: '西方古代/古典', tag: '流动之火', work: '《残篇》', quote: '人不能两次踏入同一条河流。' },
+  巴门尼德: { category: '西方古代/古典', tag: '不变之石', work: '《论自然》', quote: '存在者存在，不存在者不存在。' },
+  毕达哥拉斯: { category: '西方古代/古典', tag: '数即万物', work: '万物皆数', quote: '数是万物的本质。' },
+  伊壁鸠鲁: { category: '西方古代/古典', tag: '快乐智者', work: '《致美诺寇的信》', quote: '快乐是幸福生活的起点和终点。' },
+  芝诺: { category: '西方古代/古典', tag: '悖论之盾', work: '芝诺悖论', quote: '飞矢不动。' },
+  第欧根尼: { category: '西方古代/古典', tag: '犬儒狂人', work: '犬儒学派', quote: '别挡住我的阳光。' },
+  '马可·奥勒留': { category: '西方古代/古典', tag: '帝王哲人', work: '《沉思录》', quote: '你拥有控制自己思想的权力——这是外界无法触及的。' },
+  塞涅卡: { category: '西方古代/古典', tag: '斯多葛之笔', work: '《论生命之短暂》', quote: '命运眷顾勇者，但勇敢者从不在意命运是否眷顾。' },
+  奥古斯丁: { category: '西方古代/古典', tag: '忏悔圣徒', work: '《忏悔录》', quote: '你为你自己创造了我们，我们的心永不安息，直到安息于你。' },
+  墨子: { category: '东方哲人', tag: '兼爱巨子', work: '《墨子》', quote: '视人之国若视其国，视人之家若视其家。' },
+  孔子: { category: '东方哲人', tag: '礼乐先师', work: '《论语》', quote: '己所不欲，勿施于人。' },
+  孟子: { category: '东方哲人', tag: '性善之辩', work: '《孟子》', quote: '人皆有不忍人之心。' },
+  荀子: { category: '东方哲人', tag: '性恶之规', work: '《荀子》', quote: '人之性恶，其善者伪也。' },
+  老子: { category: '东方哲人', tag: '无为之源', work: '《道德经》', quote: '道可道，非常道。' },
+  庄子: { category: '东方哲人', tag: '逍遥游者', work: '《庄子》', quote: '子非鱼，安知鱼之乐？' },
+  韩非子: { category: '东方哲人', tag: '法家之刃', work: '《韩非子》', quote: '刑过不避大臣，赏善不遗匹夫。' },
+  王阳明: { category: '东方哲人', tag: '知行合一', work: '《传习录》', quote: '致良知。' },
+  朱熹: { category: '东方哲人', tag: '格物穷理', work: '《四书章句集注》', quote: '存天理，灭人欲。' },
+  慧能: { category: '东方哲人', tag: '顿悟禅心', work: '《六祖坛经》', quote: '本来无一物，何处惹尘埃。' },
+  张载: { category: '东方哲人', tag: '横渠四句', work: '《正蒙》', quote: '为天地立心，为生民立命，为往圣继绝学，为万世开太平。' },
+  周敦颐: { category: '东方哲人', tag: '太极说者', work: '《太极图说》', quote: '无极而太极。' },
+  康德: { category: '近现代西方哲学家', tag: '星空律令', work: '《纯粹理性批判》', quote: '有两样东西，越是持久思考，越让心灵充满日新又新的敬畏：头顶的星空，和心中的道德律。' },
+  尼采: { category: '近现代西方哲学家', tag: '超人预言', work: '《查拉图斯特拉如是说》', quote: '那些杀不死我的，使我更强大。' },
+  叔本华: { category: '近现代西方哲学家', tag: '悲观智者', work: '《作为意志和表象的世界》', quote: '人生如钟摆，在痛苦与无聊之间往复摆动。' },
+  海德格尔: { category: '近现代西方哲学家', tag: '向死而生', work: '《存在与时间》', quote: '人是被抛入世界的。' },
+  萨特: { category: '近现代西方哲学家', tag: '自由之刑', work: '《存在与虚无》', quote: '人是自由的，人注定自由，人背负着自由的重量。' },
+  加缪: { category: '近现代西方哲学家', tag: '荒谬英雄', work: '《西西弗斯神话》', quote: '我们必须想象西西弗斯是幸福的。' },
+  福柯: { category: '近现代西方哲学家', tag: '权力之眼', work: '《规训与惩罚》', quote: '知识即权力。' },
+  德里达: { category: '近现代西方哲学家', tag: '解构之锋', work: '《书写与差异》', quote: '文本之外，别无他物。' },
+  罗素: { category: '近现代西方哲学家', tag: '逻辑之剑', work: '《西方哲学史》', quote: '三种激情支配了我的一生：对爱的渴望，对知识的探求，对人类苦难的深切同情。' },
+  维特根斯坦: { category: '近现代西方哲学家', tag: '语言界限', work: '《逻辑哲学论》', quote: '凡不可言说者，必须保持沉默。' },
+  克尔凯郭尔: { category: '近现代西方哲学家', tag: '信仰一跃', work: '《恐惧与颤栗》', quote: '焦虑是自由的眩晕。' },
+  胡塞尔: { category: '近现代西方哲学家', tag: '回到事物本身', work: '《逻辑研究》', quote: '回到事物本身。' },
+  弗洛伊德: { category: '近现代西方哲学家', tag: '潜意识之父', work: '《梦的解析》', quote: '梦是愿望的满足。' },
+  荣格: { category: '近现代西方哲学家', tag: '集体无意识', work: '《红书》', quote: '直到你让潜意识成为意识，它将主导你的生活，而你称之为命运。' },
+  纪伯伦: { category: '诗人/文学家哲思', tag: '先知诗人', work: '《先知》', quote: '你的孩子不是你的孩子。他们是生命对自身渴望的儿女。' },
+  泰戈尔: { category: '诗人/文学家哲思', tag: '飞鸟之歌', work: '《飞鸟集》', quote: '世界对着它的爱人，把它浩瀚的面具揭下了。' },
+  鲁米: { category: '诗人/文学家哲思', tag: '爱的苏菲', work: '《在春天走进果园》', quote: '你生而有翼，为何却要爬行？' },
+  里尔克: { category: '诗人/文学家哲思', tag: '沉默之诗', work: '《给一个青年诗人的信》', quote: '要有耐心，对一切尚未解决的事，对一切尚未有答案的问题。学习去爱问题本身。' },
+  博尔赫斯: { category: '诗人/文学家哲思', tag: '迷宫书写者', work: '《小径分岔的花园》', quote: '天堂应该是图书馆的模样。' },
+  黑塞: { category: '诗人/文学家哲思', tag: '荒原狼', work: '《荒原狼》', quote: '每个人的内心深处都有一匹荒原狼。' },
+  阿伦特: { category: '当代思想者', tag: '平庸之恶', work: '《耶路撒冷的艾希曼》', quote: '恶的平庸性，比恶本身更令人恐惧。' },
+  波伏娃: { category: '当代思想者', tag: '第二性', work: '《第二性》', quote: '女人不是天生的，而是被塑造的。' },
+  阿多诺: { category: '当代思想者', tag: '否定辩证法', work: '《否定的辩证法》', quote: '在错误的生活中，没有正确的生活。' },
+  马尔库塞: { category: '当代思想者', tag: '单向度的人', work: '《单向度的人》', quote: '发达工业社会是一个极权社会——它以"舒适"收买了反抗。' },
+  本雅明: { category: '当代思想者', tag: '灵光消逝', work: '《机械复制时代的艺术作品》', quote: '即使是最完美的复制品，也缺少灵光——此时此地的独一无二。' },
+  塔可夫斯基: { category: '当代思想者', tag: '雕刻时光', work: '《雕刻时光》', quote: '艺术是祈祷的一种形式。' }
+};
+
+const QUESTIONS = [
+  { id: 'Q1', section: '面对世界的方式', text: '当你面对一个重大决定时，你通常……', options: [ { key: 'A', text: '追溯前人的经验和经典，寻找可遵循的法则。' }, { key: 'B', text: '相信自己的直觉，跟随内心的声音。' }, { key: 'C', text: '用逻辑推理拆解问题，一步步分析利弊。' } ] },
+  { id: 'Q2', section: '面对世界的方式', text: '你对"真理"的看法更接近……', options: [ { key: 'A', text: '真理是客观存在的，等待我们去发现。' }, { key: 'B', text: '真理是相对的，取决于看问题的角度。' }, { key: 'C', text: '真理需要被不断追问，过程比答案重要。' } ] },
+  { id: 'Q3', section: '面对世界的方式', text: '你认为人类痛苦的根源是什么？', options: [ { key: 'A', text: '欲望太多，无法满足。' }, { key: 'B', text: '人与人之间的不理解与隔阂。' }, { key: 'C', text: '对死亡和无常的恐惧。' } ] },
+  { id: 'Q4', section: '自我与人性', text: '你最认同哪一句关于"自我"的描述？', options: [ { key: 'A', text: '"认识你自己。"' }, { key: 'B', text: '"我思故我在。"' }, { key: 'C', text: '"成为你自己。"' } ] },
+  { id: 'Q5', section: '自我与人性', text: '你认为人的本性是……', options: [ { key: 'A', text: '本善的，只是被环境遮蔽了。' }, { key: 'B', text: '本恶的，需要教育和规则来约束。' }, { key: 'C', text: '空白的，由经历和文化书写而成。' } ] },
+  { id: 'Q6', section: '自我与人性', text: '当你感到焦虑时，你更倾向于……', options: [ { key: 'A', text: '深入思考焦虑的根源，试图理解它。' }, { key: 'B', text: '用行动来转移注意力，做具体的事。' }, { key: 'C', text: '沉浸在一本书、一部电影或艺术中。' } ] },
+  { id: 'Q7', section: '与他人/社会的关系', text: '你认为理想的社会应该是……', options: [ { key: 'A', text: '人人平等，兼爱互利。' }, { key: 'B', text: '各司其职，秩序井然。' }, { key: 'C', text: '给个体最大自由，减少干预。' } ] },
+  { id: 'Q8', section: '与他人/社会的关系', text: '你对待规则的态度是……', options: [ { key: 'A', text: '规则是必要的，但可以适时变通。' }, { key: 'B', text: '规则必须被严格遵守，否则社会将崩坏。' }, { key: 'C', text: '规则往往是权力制定的，值得怀疑。' } ] },
+  { id: 'Q9', section: '与他人/社会的关系', text: '你在人际关系中最看重什么？', options: [ { key: 'A', text: '真诚与平等。' }, { key: 'B', text: '智识上的共鸣与对等的交流。' }, { key: 'C', text: '情感的温暖与无条件的接纳。' } ] },
+  { id: 'Q10', section: '与知识/智慧的关系', text: '你学习或阅读的动力主要来自……', options: [ { key: 'A', text: '对世界的好奇心。' }, { key: 'B', text: '寻求人生的答案和方向。' }, { key: 'C', text: '纯粹的美感享受和对语言的迷恋。' } ] },
+  { id: 'Q11', section: '与知识/智慧的关系', text: '你认为"智慧"的本质是……', options: [ { key: 'A', text: '知道什么最重要，什么不值得在意。' }, { key: 'B', text: '能看到事物的整体，而非局部。' }, { key: 'C', text: '勇敢地面对自己的无知。' } ] },
+  { id: 'Q12', section: '与知识/智慧的关系', text: '你更容易被哪种知识吸引？', options: [ { key: 'A', text: '系统的、逻辑严密的知识体系。' }, { key: 'B', text: '碎片化的、灵光一现的洞察。' }, { key: 'C', text: '有温度的故事和隐喻。' } ] },
+  { id: 'Q13', section: '与世界的关系', text: '你对"自然"的态度是……', options: [ { key: 'A', text: '自然是需要被理解和敬畏的。' }, { key: 'B', text: '自然是需要被改造和利用的。' }, { key: 'C', text: '自然是我与之共存的伙伴。' } ] },
+  { id: 'Q14', section: '与世界的关系', text: '你对"死亡"的看法……', options: [ { key: 'A', text: '死亡是生命的终结，所以要珍惜当下。' }, { key: 'B', text: '死亡是另一种存在的开始。' }, { key: 'C', text: '死亡是生命的完成，如同秋叶落下。' } ] },
+  { id: 'Q15', section: '与世界的关系', text: '你更相信"命运"还是"自由意志"？', options: [ { key: 'A', text: '命运是存在的，但我可以在其中做出选择。' }, { key: 'B', text: '我完全掌控自己的命运。' }, { key: 'C', text: '命运是一种叙事，我们可以重新讲述它。' } ] },
+  { id: 'Q16', section: '审美与生活', text: '你心中"美"的最高形式是……', options: [ { key: 'A', text: '和谐、对称与秩序。' }, { key: 'B', text: '残缺、留白与忧伤。' }, { key: 'C', text: '绚烂、狂野与自由。' } ] },
+  { id: 'Q17', section: '审美与生活', text: '你理想中的一天是……', options: [ { key: 'A', text: '有规律地读书、思考、与人交谈。' }, { key: 'B', text: '随心所欲，漫无目的地游荡。' }, { key: 'C', text: '沉浸在创作或劳动中，忘记时间。' } ] },
+  { id: 'Q18', section: '审美与生活', text: '你更享受哪种孤独？', options: [ { key: 'A', text: '创造性的孤独——在孤独中创作。' }, { key: 'B', text: '反思性的孤独——在孤独中看清自己。' }, { key: 'C', text: '自由的孤独——不被任何人期待。' } ] },
+  { id: 'Q19', section: '终极追问', text: '如果人生只能做一件事，你会选……', options: [ { key: 'A', text: '追求真理。' }, { key: 'B', text: '造福他人。' }, { key: 'C', text: '成为自己。' } ] },
+  { id: 'Q20', section: '终极追问', text: '你相信"意义"是……', options: [ { key: 'A', text: '被发现的，它本来就存在。' }, { key: 'B', text: '被创造的，我们自己赋予它。' }, { key: 'C', text: '被感受的，它在体验之中。' } ] },
+  { id: 'Q21', section: '终极追问', text: '你认为人类的终极使命是……', options: [ { key: 'A', text: '认识世界，理解规律。' }, { key: 'B', text: '认识自己，完善灵魂。' }, { key: 'C', text: '建立联结，消除隔阂。' } ] },
+  { id: 'Q22', section: '快问快答', text: '你更害怕……', options: [ { key: 'A', text: '虚度一生，没有意义。' }, { key: 'B', text: '失去独立思考的能力。' }, { key: 'C', text: '与世界失去连接，被彻底遗忘。' } ] },
+  { id: 'Q23', section: '快问快答', text: '你更愿意被后人记住为……', options: [ { key: 'A', text: '一个探寻者。' }, { key: 'B', text: '一个创造者。' }, { key: 'C', text: '一个守护者。' } ] },
+  { id: 'Q24', section: '快问快答', text: '你心中理想的对话是……', options: [ { key: 'A', text: '逻辑严密、论证精彩的辩论。' }, { key: 'B', text: '诗意流淌、意犹未尽的交谈。' }, { key: 'C', text: '直指人心、不留情面的拷问。' } ] },
+  { id: 'Q25', section: '快问快答', text: '最后一题：你现在最强烈的感受是……', options: [ { key: 'A', text: '对答案的渴望。' }, { key: 'B', text: '对问题的热爱。' }, { key: 'C', text: '对存在的惊叹。' } ] }
+];
+
+const QUESTION_MAPPING = {
+  Q1: { A: { D1: 2, D3: 1 }, B: { D4: 2, D5: 1 }, C: { D1: 1, D3: 2 } },
+  Q2: { A: { D2: 2, D1: 1 }, B: { D4: 2, D6: 1 }, C: { D7: 2, D6: 1 } },
+  Q3: { A: { D5: 2, D7: 1 }, B: { D8: 2, D4: 1 }, C: { D7: 2, D5: 1 } },
+  Q4: { A: { D7: 2, D4: 1 }, B: { D1: 2, D7: 1 }, C: { D4: 2, D6: 1 } },
+  Q5: { A: { D8: 2, D5: 1 }, B: { D1: 2, D3: 1 }, C: { D4: 2, D8: 1 } },
+  Q6: { A: { D7: 2, D5: 1 }, B: { D3: 2, D1: 1 }, C: { D5: 2, D7: 1 } },
+  Q7: { A: { D8: 2, D2: 1 }, B: { D2: 2, D1: 1 }, C: { D4: 2, D6: 1 } },
+  Q8: { A: { D1: 2, D3: 1 }, B: { D1: 1, D2: 1 }, C: { D6: 2, D4: 1 } },
+  Q9: { A: { D8: 2, D5: 1 }, B: { D1: 2, D6: 1 }, C: { D5: 2, D8: 1 } },
+  Q10: { A: { D1: 2, D7: 1 }, B: { D2: 2, D7: 1 }, C: { D5: 2, D7: 1 } },
+  Q11: { A: { D5: 2, D8: 1 }, B: { D7: 2, D4: 1 }, C: { D6: 2, D1: 1 } },
+  Q12: { A: { D1: 2, D2: 1 }, B: { D4: 2, D6: 1 }, C: { D5: 2, D8: 1 } },
+  Q13: { A: { D7: 2, D4: 1 }, B: { D3: 2, D1: 1 }, C: { D5: 2, D8: 1 } },
+  Q14: { A: { D3: 2, D1: 1 }, B: { D2: 2, D7: 1 }, C: { D7: 2, D5: 1 } },
+  Q15: { A: { D3: 2, D1: 1 }, B: { D4: 2, D6: 1 }, C: { D6: 2, D4: 1 } },
+  Q16: { A: { D1: 2, D2: 1 }, B: { D5: 2, D7: 1 }, C: { D4: 2, D5: 1 } },
+  Q17: { A: { D1: 2, D3: 1 }, B: { D4: 2, D5: 1 }, C: { D5: 2, D7: 1 } },
+  Q18: { A: { D5: 2, D7: 1 }, B: { D7: 2, D4: 1 }, C: { D4: 2, D6: 1 } },
+  Q19: { A: { D1: 2, D7: 1 }, B: { D8: 2, D3: 1 }, C: { D4: 2, D5: 1 } },
+  Q20: { A: { D2: 2, D7: 1 }, B: { D4: 2, D6: 1 }, C: { D5: 2, D8: 1 } },
+  Q21: { A: { D1: 2, D7: 1 }, B: { D4: 2, D7: 1 }, C: { D8: 2, D2: 1 } },
+  Q22: { A: { D7: 2, D5: 1 }, B: { D6: 2, D4: 1 }, C: { D5: 2, D7: 1 } },
+  Q23: { A: { D7: 2, D6: 1 }, B: { D4: 2, D5: 1 }, C: { D8: 2, D3: 1 } },
+  Q24: { A: { D1: 2, D6: 1 }, B: { D5: 2, D8: 1 }, C: { D6: 2, D1: 1 } },
+  Q25: { A: { D2: 2, D7: 1 }, B: { D6: 2, D1: 1 }, C: { D7: 2, D5: 1 } }
+};
+
+// --- 核心算法 ---
+const DIMENSION_WEIGHTS = { D1: 1.2, D2: 1.0, D3: 0.9, D4: 1.2, D5: 1.0, D6: 1.1, D7: 1.0, D8: 0.9 };
+const DIMENSION_KEYS = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'];
+
+function calculateUserVector(answers) {
+    let userVector = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0, D6: 0, D7: 0, D8: 0 };
+    for (let qId in answers) {
+        let choice = answers[qId];
+        let mapping = QUESTION_MAPPING[qId]?.[choice];
+        if (mapping) {
+            for (let dim in mapping) userVector[dim] += mapping[dim];
         }
-    </script>
+    }
+    for (let dim of DIMENSION_KEYS) {
+        userVector[dim] = Math.min(10, (userVector[dim] / 8) * 10); 
+    }
+    return userVector;
+}
+
+function cosineSimilarity(vecA, vecB) {
+    let dot = 0, normA = 0, normB = 0;
+    for (let d of DIMENSION_KEYS) {
+        let w = DIMENSION_WEIGHTS[d];
+        dot += w * vecA[d] * vecB[d];
+        normA += w * Math.pow(vecA[d], 2);
+        normB += w * Math.pow(vecB[d], 2);
+    }
+    if (normA === 0 || normB === 0) return 0;
+    return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+function getFinalResult(answers) {
+    let userVector = calculateUserVector(answers);
+    let scores = [];
+    for (let name in PHILOSOPHER_VECTORS) {
+        scores.push({ name: name, score: cosineSimilarity(userVector, PHILOSOPHER_VECTORS[name]) });
+    }
+    scores.sort((a, b) => b.score - a.score);
+    return scores[0];
+}
+
+// --- 前端交互逻辑 ---
+const appDiv = document.getElementById('app');
+let currentStep = 'welcome';
+let currentQuestionIndex = 0;
+let userAnswers = {};
+
+function render() {
+    if (currentStep === 'welcome') {
+        appDiv.innerHTML = `
+            <div class="card">
+                <h1 class="title">50位思想家：寻找你的精神镜像</h1>
+                <p class="subtitle">这是一次跨越时空的思想对话。<br>共25题，预计耗时5-8分钟。</p>
+                <button class="primary-btn" onclick="startQuiz()">开始探索</button>
+            </div>
+        `;
+    } else if (currentStep === 'quiz') {
+        let q = QUESTIONS[currentQuestionIndex];
+        let optionsHtml = q.options.map(opt => `
+            <button class="option-btn" onclick="selectAnswer('${q.id}', '${opt.key}')">${opt.text}</button>
+        `).join('');
+        
+        appDiv.innerHTML = `
+            <div class="card">
+                <div class="quiz-header">
+                    <span>${q.section}</span>
+                    <span>${currentQuestionIndex + 1} / ${QUESTIONS.length}</span>
+                </div>
+                <h2 class="question-text">${q.text}</h2>
+                <div class="options-container">${optionsHtml}</div>
+            </div>
+        `;
+    } else if (currentStep === 'result') {
+        let result = getFinalResult(userAnswers);
+        let meta = PHILOSOPHER_META[result.name];
+        let similarity = (result.score * 100).toFixed(1);
+        
+        appDiv.innerHTML = `
+            <div class="card">
+                <h1 class="title">${result.name}</h1>
+                <p style="color: #666; margin-bottom: 20px;">「 ${meta.tag} 」</p>
+                <div class="quote">"${meta.quote}"</div>
+                <div class="meta-info">
+                    <p><strong>代表作：</strong> ${meta.work}</p>
+                    <p><strong>匹配度：</strong> ${similarity}%</p>
+                </div>
+                <button class="primary-btn" onclick="restart()">重新测试</button>
+            </div>
+        `;
+    }
+}
+
+function startQuiz() {
+    currentQuestionIndex = 0;
+    userAnswers = {};
+    currentStep = 'quiz';
+    render();
+}
+
+function selectAnswer(qId, choiceKey) {
+    userAnswers[qId] = choiceKey;
+    if (currentQuestionIndex < QUESTIONS.length - 1) {
+        currentQuestionIndex++;
+        render();
+    } else {
+        currentStep = 'result';
+        render();
+    }
+}
+
+function restart() {
+    currentStep = 'welcome';
+    render();
+}
+
+// 初始渲染
+render();
+
+</script>
 </body>
 </html>
