@@ -1,172 +1,60 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>50位思想家：精神镜像测算</title>
-    <!-- 引入 Chart.js 用于绘制雷达图 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --bg-color: #f7f7f7;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --border-color: #e0e0e0;
-            --accent-color: #222222;
-            --hover-color: #ebebeb;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: var(--bg-color); color: var(--text-primary);
-            font-family: "Helvetica Neue", -apple-system, sans-serif; line-height: 1.6;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-        }
-        #app { width: 100%; max-width: 600px; padding: 20px; }
-        .card { background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.06); text-align: center; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .title { font-size: 26px; font-weight: 600; margin-bottom: 12px; letter-spacing: 0.5px; }
-        .subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 30px; }
-        
-        .quiz-header { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; font-weight: 500; letter-spacing: 1px; }
-        .question-text { font-size: 19px; font-weight: 600; margin-bottom: 32px; text-align: left; line-height: 1.5; }
-        
-        .options-container { display: flex; flex-direction: column; gap: 14px; }
-        .option-btn { background: #ffffff; border: 1px solid var(--border-color); padding: 18px 24px; border-radius: 12px; font-size: 16px; text-align: left; cursor: pointer; transition: all 0.2s ease; line-height: 1.4; color: var(--text-primary); }
-        .option-btn:hover { background: var(--hover-color); border-color: #ccc; transform: translateY(-1px); }
-        
-        .primary-btn { background: var(--accent-color); color: #ffffff; border: none; padding: 15px 36px; border-radius: 30px; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.2s; margin-top: 20px; }
-        .primary-btn:hover { opacity: 0.85; transform: scale(1.02); }
-        
-        .result-tag { display: inline-block; padding: 6px 14px; background: #f0f0f0; border-radius: 20px; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 20px; }
-        .quote { font-size: 18px; font-style: italic; color: #333; margin: 25px 0; text-align: center; font-weight: 500; }
-        .quote::before { content: "“"; font-size: 24px; color: #999; }
-        .quote::after { content: "”"; font-size: 24px; color: #999; }
-        
-        .chart-container { position: relative; width: 100%; max-width: 400px; margin: 0 auto 30px auto; aspect-ratio: 1; }
-        
-        .meta-info { display: flex; justify-content: space-around; background: #fafafa; padding: 20px; border-radius: 12px; font-size: 14px; margin-bottom: 30px; border: 1px solid var(--border-color); }
-        .meta-item { display: flex; flex-direction: column; gap: 5px; }
-        .meta-label { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .meta-value { font-weight: 600; color: var(--accent-color); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>50位思想家：精神镜像测算</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root { --bg: #1a1a1a; --text: #f0f0f0; --card: rgba(255,255,255,0.08); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: var(--bg); color: var(--text);
+    min-height: 100vh; transition: background-color 1.5s ease;
+    overflow-x: hidden; line-height: 1.6;
+  }
+  .container { max-width: 640px; margin: 0 auto; padding: 40px 20px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+  
+  .card { background: var(--card); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 32px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: fadeIn 0.8s ease; }
+  .title { font-size: 26px; font-weight: 300; letter-spacing: 3px; text-align: center; margin-bottom: 12px; }
+  .subtitle { font-size: 14px; color: #aaa; text-align: center; margin-bottom: 32px; }
+  
+  .btn { width: 100%; padding: 16px; font-size: 16px; color: #fff; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 50px; cursor: pointer; transition: all 0.3s; letter-spacing: 2px; margin-top: 20px; }
+  .btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+  
+  .quiz-header { display: flex; justify-content: space-between; font-size: 13px; color: #aaa; margin-bottom: 20px; letter-spacing: 1px; }
+  .question-text { font-size: 18px; font-weight: 400; margin-bottom: 24px; line-height: 1.5; }
+  .option-btn { width: 100%; padding: 16px; margin-bottom: 12px; text-align: left; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #e0e0e0; cursor: pointer; transition: all 0.2s; font-size: 15px; }
+  .option-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+  
+  .result-tag { text-align: center; font-size: 13px; color: #aaa; letter-spacing: 2px; margin-bottom: 8px; }
+  .match-score { text-align: center; font-size: 36px; font-weight: 300; margin-bottom: 8px; background: linear-gradient(135deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .thinker-name { text-align: center; font-size: 32px; font-weight: 300; letter-spacing: 4px; margin-bottom: 4px; }
+  .thinker-tag { text-align: center; font-size: 14px; color: #ccc; margin-bottom: 20px; }
+  .color-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.2); }
+  
+  .quote { font-size: 18px; font-style: italic; text-align: center; line-height: 1.6; color: #fff; font-weight: 300; margin: 24px 0; padding: 20px; border-left: 3px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.2); border-radius: 0 12px 12px 0; }
+  
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 13px; color: #aaa; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; border-left: 3px solid rgba(255,255,255,0.5); padding-left: 10px; }
+  .section-content { font-size: 15px; line-height: 1.8; color: #e0e0e0; }
+  
+  .chart-container { position: relative; height: 300px; width: 100%; margin: 30px 0; }
+  
+  .list-item { margin-bottom: 10px; font-size: 14px; line-height: 1.6; color: #ddd; padding-left: 16px; position: relative; }
+  .list-item::before { content: "•"; position: absolute; left: 0; color: #fff; }
+  
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 </head>
 <body>
 
-<div id="app"></div>
+<div class="container" id="app"></div>
 
 <script>
 // ==========================================
-// 1. 底层数据：哲学家基准向量与元数据
-// ==========================================
-const PHILOSOPHER_VECTORS = {
-  苏格拉底: { D1: 9, D2: 8, D3: 7, D4: 9, D5: 3, D6: 9, D7: 9, D8: 5 },
-  柏拉图: { D1: 8, D2: 10, D3: 3, D4: 7, D5: 4, D6: 7, D7: 9, D8: 4 },
-  亚里士多德: { D1: 9, D2: 6, D3: 8, D4: 6, D5: 5, D6: 4, D7: 6, D8: 6 },
-  赫拉克利特: { D1: 6, D2: 5, D3: 4, D4: 8, D5: 6, D6: 7, D7: 9, D8: 3 },
-  巴门尼德: { D1: 9, D2: 7, D3: 3, D4: 7, D5: 2, D6: 5, D7: 8, D8: 2 },
-  毕达哥拉斯: { D1: 8, D2: 8, D3: 5, D4: 5, D5: 4, D6: 3, D7: 6, D8: 4 },
-  伊壁鸠鲁: { D1: 6, D2: 4, D3: 5, D4: 7, D5: 6, D6: 3, D7: 4, D8: 6 },
-  芝诺: { D1: 10, D2: 4, D3: 4, D4: 6, D5: 2, D6: 9, D7: 6, D8: 2 },
-  第欧根尼: { D1: 5, D2: 3, D3: 6, D4: 10, D5: 3, D6: 9, D7: 5, D8: 2 },
-  '马可·奥勒留': { D1: 7, D2: 5, D3: 8, D4: 6, D5: 5, D6: 3, D7: 7, D8: 5 },
-  塞涅卡: { D1: 7, D2: 5, D3: 7, D4: 6, D5: 6, D6: 4, D7: 7, D8: 6 },
-  奥古斯丁: { D1: 6, D2: 9, D3: 4, D4: 5, D5: 8, D6: 5, D7: 8, D8: 7 },
-  墨子: { D1: 6, D2: 7, D3: 9, D4: 4, D5: 6, D6: 6, D7: 3, D8: 9 },
-  孔子: { D1: 7, D2: 7, D3: 8, D4: 4, D5: 5, D6: 3, D7: 5, D8: 7 },
-  孟子: { D1: 5, D2: 9, D3: 7, D4: 5, D5: 8, D6: 5, D7: 5, D8: 9 },
-  荀子: { D1: 8, D2: 4, D3: 8, D4: 5, D5: 3, D6: 6, D7: 4, D8: 4 },
-  老子: { D1: 7, D2: 4, D3: 4, D4: 9, D5: 4, D6: 4, D7: 8, D8: 5 },
-  庄子: { D1: 5, D2: 3, D3: 3, D4: 10, D5: 5, D6: 6, D7: 9, D8: 5 },
-  韩非子: { D1: 9, D2: 3, D3: 9, D4: 6, D5: 2, D6: 8, D7: 4, D8: 2 },
-  王阳明: { D1: 6, D2: 8, D3: 9, D4: 7, D5: 6, D6: 6, D7: 6, D8: 6 },
-  朱熹: { D1: 9, D2: 7, D3: 7, D4: 4, D5: 3, D6: 4, D7: 5, D8: 3 },
-  慧能: { D1: 4, D2: 4, D3: 4, D4: 8, D5: 5, D6: 5, D7: 9, D8: 6 },
-  张载: { D1: 7, D2: 10, D3: 7, D4: 5, D5: 5, D6: 5, D7: 6, D8: 7 },
-  周敦颐: { D1: 8, D2: 8, D3: 4, D4: 5, D5: 4, D6: 3, D7: 8, D8: 4 },
-  康德: { D1: 10, D2: 8, D3: 7, D4: 6, D5: 3, D6: 5, D7: 8, D8: 4 },
-  尼采: { D1: 6, D2: 9, D3: 8, D4: 10, D5: 6, D6: 9, D7: 8, D8: 3 },
-  叔本华: { D1: 7, D2: 3, D3: 3, D4: 7, D5: 5, D6: 7, D7: 9, D8: 5 },
-  海德格尔: { D1: 6, D2: 5, D3: 4, D4: 6, D5: 5, D6: 5, D7: 10, D8: 4 },
-  萨特: { D1: 7, D2: 8, D3: 8, D4: 10, D5: 5, D6: 9, D7: 8, D8: 3 },
-  加缪: { D1: 6, D2: 6, D3: 8, D4: 7, D5: 6, D6: 7, D7: 9, D8: 6 },
-  福柯: { D1: 7, D2: 5, D3: 6, D4: 8, D5: 4, D6: 10, D7: 7, D8: 5 },
-  德里达: { D1: 6, D2: 4, D3: 3, D4: 7, D5: 4, D6: 9, D7: 7, D8: 4 },
-  罗素: { D1: 9, D2: 6, D3: 7, D4: 6, D5: 7, D6: 5, D7: 5, D8: 7 },
-  维特根斯坦: { D1: 9, D2: 5, D3: 4, D4: 6, D5: 3, D6: 8, D7: 7, D8: 3 },
-  克尔凯郭尔: { D1: 5, D2: 7, D3: 4, D4: 8, D5: 8, D6: 6, D7: 9, D8: 6 },
-  胡塞尔: { D1: 9, D2: 6, D3: 4, D4: 5, D5: 3, D6: 4, D7: 6, D8: 4 },
-  弗洛伊德: { D1: 7, D2: 4, D3: 6, D4: 5, D5: 6, D6: 8, D7: 7, D8: 6 },
-  荣格: { D1: 5, D2: 6, D3: 4, D4: 8, D5: 7, D6: 6, D7: 9, D8: 7 },
-  纪伯伦: { D1: 4, D2: 5, D3: 4, D4: 7, D5: 9, D6: 3, D7: 7, D8: 10 },
-  泰戈尔: { D1: 4, D2: 6, D3: 4, D4: 6, D5: 9, D6: 3, D7: 8, D8: 9 },
-  鲁米: { D1: 3, D2: 5, D3: 4, D4: 7, D5: 10, D6: 3, D7: 8, D8: 9 },
-  里尔克: { D1: 5, D2: 5, D3: 4, D4: 6, D5: 8, D6: 4, D7: 9, D8: 7 },
-  博尔赫斯: { D1: 6, D2: 4, D3: 3, D4: 8, D5: 5, D6: 5, D7: 8, D8: 4 },
-  黑塞: { D1: 5, D2: 6, D3: 5, D4: 8, D5: 8, D6: 6, D7: 8, D8: 7 },
-  阿伦特: { D1: 8, D2: 6, D3: 6, D4: 9, D5: 5, D6: 10, D7: 7, D8: 6 },
-  波伏娃: { D1: 7, D2: 8, D3: 7, D4: 10, D5: 6, D6: 8, D7: 6, D8: 5 },
-  阿多诺: { D1: 8, D2: 4, D3: 4, D4: 7, D5: 4, D6: 10, D7: 7, D8: 4 },
-  马尔库塞: { D1: 7, D2: 6, D3: 5, D4: 6, D5: 4, D6: 9, D7: 7, D8: 5 },
-  本雅明: { D1: 6, D2: 5, D3: 3, D4: 7, D5: 6, D6: 7, D7: 8, D8: 6 },
-  塔可夫斯基: { D1: 5, D2: 6, D3: 4, D4: 6, D5: 8, D6: 5, D7: 9, D8: 7 },
-};
-
-const PHILOSOPHER_META = {
-  苏格拉底: { tag: '追问之父', work: '《柏拉图对话录》', quote: '未经省察的人生不值得过。' },
-  柏拉图: { tag: '理念之王', work: '《理想国》', quote: '灵魂的转向，是从看影子到看光。' },
-  亚里士多德: { tag: '中庸之师', work: '《尼各马可伦理学》', quote: '美德是介于两恶之间的黄金中道。' },
-  赫拉克利特: { tag: '流动之火', work: '《残篇》', quote: '人不能两次踏入同一条河流。' },
-  巴门尼德: { tag: '不变之石', work: '《论自然》', quote: '存在者存在，不存在者不存在。' },
-  毕达哥拉斯: { tag: '数即万物', work: '万物皆数', quote: '数是万物的本质。' },
-  伊壁鸠鲁: { tag: '快乐智者', work: '《致美诺寇的信》', quote: '快乐是幸福生活的起点和终点。' },
-  芝诺: { tag: '悖论之盾', work: '芝诺悖论', quote: '飞矢不动。' },
-  第欧根尼: { tag: '犬儒狂人', work: '犬儒学派', quote: '别挡住我的阳光。' },
-  '马可·奥勒留': { tag: '帝王哲人', work: '《沉思录》', quote: '你拥有控制自己思想的权力——这是外界无法触及的。' },
-  塞涅卡: { tag: '斯多葛之笔', work: '《论生命之短暂》', quote: '命运眷顾勇者，但勇敢者从不在意命运是否眷顾。' },
-  奥古斯丁: { tag: '忏悔圣徒', work: '《忏悔录》', quote: '你为你自己创造了我们，我们的心永不安息，直到安息于你。' },
-  墨子: { tag: '兼爱巨子', work: '《墨子》', quote: '视人之国若视其国，视人之家若视其家。' },
-  孔子: { tag: '礼乐先师', work: '《论语》', quote: '己所不欲，勿施于人。' },
-  孟子: { tag: '性善之辩', work: '《孟子》', quote: '人皆有不忍人之心。' },
-  荀子: { tag: '性恶之规', work: '《荀子》', quote: '人之性恶，其善者伪也。' },
-  老子: { tag: '无为之源', work: '《道德经》', quote: '道可道，非常道。' },
-  庄子: { tag: '逍遥游者', work: '《庄子》', quote: '子非鱼，安知鱼之乐？' },
-  韩非子: { tag: '法家之刃', work: '《韩非子》', quote: '刑过不避大臣，赏善不遗匹夫。' },
-  王阳明: { tag: '知行合一', work: '《传习录》', quote: '致良知。' },
-  朱熹: { tag: '格物穷理', work: '《四书章句集注》', quote: '存天理，灭人欲。' },
-  慧能: { tag: '顿悟禅心', work: '《六祖坛经》', quote: '本来无一物，何处惹尘埃。' },
-  张载: { tag: '横渠四句', work: '《正蒙》', quote: '为天地立心，为生民立命，为往圣继绝学，为万世开太平。' },
-  周敦颐: { tag: '太极说者', work: '《太极图说》', quote: '无极而太极。' },
-  康德: { tag: '星空律令', work: '《纯粹理性批判》', quote: '有两样东西，越是持久思考，越让心灵充满日新又新的敬畏：头顶的星空，和心中的道德律。' },
-  尼采: { tag: '超人预言', work: '《查拉图斯特拉如是说》', quote: '那些杀不死我的，使我更强大。' },
-  叔本华: { tag: '悲观智者', work: '《作为意志和表象的世界》', quote: '人生如钟摆，在痛苦与无聊之间往复摆动。' },
-  海德格尔: { tag: '向死而生', work: '《存在与时间》', quote: '人是被抛入世界的。' },
-  萨特: { tag: '自由之刑', work: '《存在与虚无》', quote: '人是自由的，人注定自由，人背负着自由的重量。' },
-  加缪: { tag: '荒谬英雄', work: '《西西弗斯神话》', quote: '我们必须想象西西弗斯是幸福的。' },
-  福柯: { tag: '权力之眼', work: '《规训与惩罚》', quote: '知识即权力。' },
-  德里达: { tag: '解构之锋', work: '《书写与差异》', quote: '文本之外，别无他物。' },
-  罗素: { tag: '逻辑之剑', work: '《西方哲学史》', quote: '三种激情支配了我的一生：对爱的渴望，对知识的探求，对人类苦难的深切同情。' },
-  维特根斯坦: { tag: '语言界限', work: '《逻辑哲学论》', quote: '凡不可言说者，必须保持沉默。' },
-  克尔凯郭尔: { tag: '信仰一跃', work: '《恐惧与颤栗》', quote: '焦虑是自由的眩晕。' },
-  胡塞尔: { tag: '回到事物本身', work: '《逻辑研究》', quote: '回到事物本身。' },
-  弗洛伊德: { tag: '潜意识之父', work: '《梦的解析》', quote: '梦是愿望的满足。' },
-  荣格: { tag: '集体无意识', work: '《红书》', quote: '直到你让潜意识成为意识，它将主导你的生活，而你称之为命运。' },
-  纪伯伦: { tag: '先知诗人', work: '《先知》', quote: '你的孩子不是你的孩子。他们是生命对自身渴望的儿女。' },
-  泰戈尔: { tag: '飞鸟之歌', work: '《飞鸟集》', quote: '世界对着它的爱人，把它浩瀚的面具揭下了。' },
-  鲁米: { tag: '爱的苏菲', work: '《在春天走进果园》', quote: '你生而有翼，为何却要爬行？' },
-  里尔克: { tag: '沉默之诗', work: '《给一个青年诗人的信》', quote: '要有耐心，对一切尚未解决的事，对一切尚未有答案的问题。学习去爱问题本身。' },
-  博尔赫斯: { tag: '迷宫书写者', work: '《小径分岔的花园》', quote: '天堂应该是图书馆的模样。' },
-  黑塞: { tag: '荒原狼', work: '《荒原狼》', quote: '每个人的内心深处都有一匹荒原狼。' },
-  阿伦特: { tag: '平庸之恶', work: '《耶路撒冷的艾希曼》', quote: '恶的平庸性，比恶本身更令人恐惧。' },
-  波伏娃: { tag: '第二性', work: '《第二性》', quote: '女人不是天生的，而是被塑造的。' },
-  阿多诺: { tag: '否定辩证法', work: '《否定的辩证法》', quote: '在错误的生活中，没有正确的生活。' },
-  马尔库塞: { tag: '单向度的人', work: '《单向度的人》', quote: '发达工业社会是一个极权社会——它以"舒适"收买了反抗。' },
-  本雅明: { tag: '灵光消逝', work: '《机械复制时代的艺术作品》', quote: '即使是最完美的复制品，也缺少灵光——此时此地的独一无二。' },
-  塔可夫斯基: { tag: '雕刻时光', work: '《雕刻时光》', quote: '艺术是祈祷的一种形式。' }
-};
-
-// ==========================================
-// 2. 问题结构与严密的数学权重映射
+// 1. 问题结构与严密的数学权重映射
 // ==========================================
 const QUESTIONS = [
   { id: 'Q1', section: '面对世界的方式', text: '当你面对一个重大决定时，你通常……', options: [ { key: 'A', text: '追溯前人的经验和经典，寻找可遵循的法则。' }, { key: 'B', text: '相信自己的直觉，跟随内心的声音。' }, { key: 'C', text: '用逻辑推理拆解问题，一步步分析利弊。' } ] },
@@ -225,11 +113,85 @@ const QUESTION_MAPPING = {
 };
 
 // ==========================================
-// 3. 核心算法：数学归一化与余弦计算
+// 2. 50位思想家 8维向量 (D1理性, D2理想, D3行动, D4个体, D5情感, D6批判, D7存在, D8共情)
+// ==========================================
+const PHILOSOPHER_VECTORS = {
+  "墨子": [7,8,9,4,4,5,5,9], "苏格拉底": [8,6,5,7,3,9,8,4], "柏拉图": [7,10,4,6,5,7,7,5], "亚里士多德": [9,7,6,5,4,6,5,5],
+  "赫拉克利特": [6,5,6,8,5,7,8,4], "巴门尼德": [10,6,3,5,2,8,6,3], "毕达哥拉斯": [10,7,4,5,6,5,5,4], "伊壁鸠鲁": [6,5,4,7,7,4,6,6],
+  "芝诺": [10,4,3,6,2,9,5,3], "第欧根尼": [5,4,6,10,3,8,7,4], "马可·奥勒留": [8,6,7,6,4,5,8,5], "塞涅卡": [7,5,6,6,5,6,8,6],
+  "奥古斯丁": [6,8,5,7,8,5,9,7], "孔子": [7,8,7,5,6,4,5,8], "孟子": [6,8,7,6,7,5,6,9], "荀子": [8,6,7,5,4,7,5,6],
+  "老子": [6,7,4,8,6,6,9,5], "庄子": [5,8,4,10,7,7,10,6], "韩非子": [9,4,8,5,2,9,6,3], "王阳明": [7,7,9,7,5,6,7,6],
+  "朱熹": [9,7,5,5,4,7,5,5], "慧能": [5,6,5,9,6,7,10,6], "张载": [7,9,8,6,5,6,7,8], "周敦颐": [8,8,4,6,5,6,8,5],
+  "康德": [10,8,5,7,3,9,7,4], "尼采": [7,8,8,10,6,9,9,4], "叔本华": [8,5,3,7,8,7,9,5], "海德格尔": [7,6,4,8,6,7,10,5],
+  "萨特": [8,6,7,10,5,8,9,5], "加缪": [7,7,8,8,6,8,9,6], "福柯": [8,5,6,8,4,10,7,5], "德里达": [9,5,4,7,6,10,6,5],
+  "罗素": [9,7,6,6,6,7,5,7], "维特根斯坦": [10,5,4,8,5,9,8,4], "克尔凯郭尔": [6,6,5,9,8,6,10,6], "胡塞尔": [9,6,4,7,5,8,7,5],
+  "弗洛伊德": [8,5,5,7,7,8,8,6], "荣格": [7,7,5,8,8,6,8,7], "纪伯伦": [5,7,5,7,9,4,7,9], "泰戈尔": [5,8,4,7,9,4,7,9],
+  "鲁米": [4,7,6,8,10,4,8,10], "里尔克": [6,7,4,8,9,5,9,6], "博尔赫斯": [8,7,4,8,6,7,8,5], "黑塞": [6,7,6,9,8,6,9,7],
+  "阿伦特": [8,7,7,8,5,9,8,6], "波伏娃": [7,8,8,9,6,8,8,7], "阿多诺": [9,6,5,7,6,10,7,5], "马尔库塞": [8,7,6,8,5,9,7,6],
+  "本雅明": [7,7,5,7,8,7,8,6], "塔可夫斯基": [6,8,5,8,9,6,9,7]
+};
+
+// ==========================================
+// 3. 50位思想家 精神画像元数据 (精简核心版)
+// ==========================================
+const PHILOSOPHER_META = {
+  "墨子": { tag: "实干派 · 利他主义", quote: "爱不是名词，是动词。", work: "《墨子》", color: "#C5393B", colorName: "朱砂红", career: "适合公共服务、教育、公益。你是天生的“系统搭建者”。", soul: "你有一种“士”的质地——务实、担当。你关心“这件事能让谁过得好一点”，是别人撤退时选择留下的人。", weakness: "你太习惯“给出”，忘了自己也需要被给予。像火把照亮别人，却少看自己的灯油。", prescription: ["帮人前先问是否对方需要。", "每周安排一天“不有用”的日子。", "练习接受帮助。"], books: ["《墨子》：重读“兼爱”篇。", "《给青年诗人的信》：教你如何“成为”。"] },
+  "苏格拉底": { tag: "追问狂 · 清醒到锋利", quote: "未经省察的人生不值得过。", work: "《柏拉图对话录》", color: "#F5F3ED", colorName: "月白", career: "适合教师、编辑、咨询师。你最大的贡献是帮别人清理思考里的杂草。", soul: "你是“令人头疼的追问者”。不接受未检验的答案，对真相有偏执洁癖。", weakness: "清醒到无法沉浸。看穿剧情就无法感动，清醒是超能力也是诅咒。", prescription: ["每周一天“不追问”。", "接受“无答案”也是答案。", "智慧是为接近对，非证明别人错。"], books: ["《柏拉图对话录》", "《沉思录》"] },
+  "柏拉图": { tag: "理想主义者 · 思辨者", quote: "灵魂的转向，是从看影子到看光。", work: "《理想国》", color: "#2C3E78", colorName: "星蓝", career: "适合学术、战略、写作。你是“蓝图型”，需“把理想翻译成现实”的伙伴。", soul: "心中有“理想版图”。活在向往完美与容忍残缺的张力中。看过光的人难对影子感兴趣。", weakness: "对“不完美”容忍度极低，易滑入虚无。有时爱上对一个人的想象，而非其人。", prescription: ["把“理想国”缩小到一平方公里。", "欣赏“影子”的美。", "下到洞穴和看影子的人聊天。"], books: ["《理想国》", "《小于一》"] },
+  "亚里士多德": { tag: "理性务实 · 分类大师", quote: "美德是两恶之间的黄金中道。", work: "《尼各马可伦理学》", color: "#5A7D54", colorName: "橄榄绿", career: "适合管理、科研。你是“框架搭建者”，能把混沌整理成体系。", soul: "天生的分类者、整合者。不迷恋极端，真理在“刚刚好”。用理性给激情画温柔边界。", weakness: "太追求“适度”，错过“过度”的壮丽。太安全，偶尔缺乏“不留退路”的动人。", prescription: ["刻意“走极端”一次。", "关掉分析模式十分钟。", "中道是智者选择，非平庸妥协。"], books: ["《尼各马可伦理学》", "《思考，快与慢》"] },
+  "赫拉克利特": { tag: "拥抱变化 · 直觉敏锐", quote: "人不能两次踏入同一条河流。", work: "《赫拉克利特残篇》", color: "#E07A2F", colorName: "焰流橙", career: "适合创意、趋势分析、创业。你是捕捉变化的人。", soul: "相信万物皆流。难被固定定义困住。静止是假象，注定无法安于“确定”的人生。", weakness: "太相信变化，失去“坚持”能力。流动可能成为逃避承诺的借口。", prescription: ["在小事上练习“不变”。", "区分“流动”和“逃避”。", "允许某些人成为河流中的礁石。"], books: ["《赫拉克利特残篇》", "《流动的现代性》"] },
+  "巴门尼德": { tag: "黑白分明 · 逻辑锋利", quote: "存在者存在，不存在者不存在。", work: "《论自然》", color: "#3A3A3A", colorName: "玄铁灰", career: "适合法律、审计、逻辑学。你是“确定性”守护者。", soul: "追求“确定性”。世界非A即非A。只有先确定“什么是真的”，才能谈其他。", weakness: "坚信存在者存在，但爱、意义建立在“不确定性”上。越用力框住，越失望。", prescription: ["每月做一件“无逻辑”的事。", "允许说“我不知道”。", "确定性是起点，丰富性在起点外。"], books: ["《论自然》残篇", "《禅与摩托车维修艺术》"] },
+  "毕达哥拉斯": { tag: "秩序敏感 · 审美理性", quote: "万物皆数。", work: "《数学之美》", color: "#D4A53C", colorName: "几何金", career: "适合数学、音乐、建筑、编程。你是“秩序感知者”。", soul: "在混沌中寻找秩序。对数字、节奏、比例有天然亲和力。情感有一套自己的算法。", weakness: "把世界“数字化”，挡住了无法数字化的东西（爱的盲目、即兴的美）。", prescription: ["刻意制造一次“无序”。", "尝试不靠逻辑的艺术。", "万物皆数，但不只是数。"], books: ["《哥德尔、艾舍尔、巴赫》", "《数学之美》"] },
+  "伊壁鸠鲁": { tag: "温和享乐者 · 追求宁静", quote: "快乐是幸福生活的起点。", work: "《伊壁鸠鲁学派文选》", color: "#7A9A5A", colorName: "苔藓绿", career: "适合生活方式、心理、园艺。你懂“少即是多”。", soul: "清醒的享乐主义者。追求“无痛苦”的宁静。擅长从简单事物中找到快乐。", weakness: "“知足”易被误解为“缺野心”。快乐哲学面对真正苦难时可能显轻巧。", prescription: ["区分“知足”和“妥协”。", "偶尔做件“不舒服但有意”的事。", "快乐是有能力选择痛苦时保持清醒。"], books: ["《伊壁鸠鲁学派文选》", "《瓦尔登湖》"] },
+  "芝诺": { tag: "逻辑锋利 · 拆解大师", quote: "飞矢不动。", work: "《芝诺残篇》", color: "#C0C0C0", colorName: "银刃", career: "适合法律辩论、逻辑、数学。你是“认知清道夫”。", soul: "天生逻辑拆解者。测试“以为的真理有多牢固”。和你对话累但过瘾。", weakness: "拆解了一切，未必能建造。证明飞矢不动，却错过箭中靶心的美。", prescription: ["每天找一件“不拆解”的事。", "用讲故事代替讲逻辑。", "悖论是边界，边界外是生活。"], books: ["《芝诺残篇》", "《哲学家的石头》"] },
+  "第欧根尼": { tag: "极度自由 · 物质极简", quote: "别挡住我的阳光。", work: "《第欧根尼传》", color: "#F5D98E", colorName: "日光黄", career: "适合自由职业、极简、流浪创作。不适合体制化。", soul: "对“外在于己”持傲慢冷淡。不care金钱名誉。在所有人追求更多时，选择“更少”。", weakness: "“不care”有时是防御。拒绝受伤，也拒绝被滋养。自由代价是不被深刻理解。", prescription: ["主动依赖一个人一次。", "区分“不需要”和“不敢要”。", "桶再自在，不如房间暖和。"], books: ["《第欧根尼传》", "《荒野生存》"] },
+  "马可·奥勒留": { tag: "情绪稳定 · 内在帝王", quote: "你拥有控制自己思想的权力。", work: "《沉思录》", color: "#8B7D3C", colorName: "罗马金", career: "适合管理、危机公关、行政。你是“情绪稳压器”。", soul: "风暴中保持呼吸的人。相信外部不可控，内部绝对可控。是自己心灵的皇帝。", weakness: "控制得太好，内心像宫殿却没窗。冷静避免崩溃，也错过狂喜。", prescription: ["每周找一晚把“控制”放门外。", "问自己“不控制会怎样”。", "帝王也需要休假。"], books: ["《沉思录》", "《活出意义来》"] },
+  "塞涅卡": { tag: "清醒的悲观 · 极高韧性", quote: "命运眷顾勇者，但勇者从不等待命运。", work: "《论生命之短暂》", color: "#7A7A7A", colorName: "暮云灰", career: "适合临终关怀、心理、危机管理。直面悲剧但依然前行。", soul: "清醒知道生命有限，却不恐惧。悲剧式的坦然：承认世界不公，但决定保持高贵。", weakness: "太习惯“扛”。很少允许自己崩溃，觉得不体面。", prescription: ["允许自己“不体面”一次。", "勇气是“允许脆弱”。", "接受死亡，也拥抱生活。"], books: ["《论生命之短暂》", "《当呼吸化为空气》"] },
+  "奥古斯丁": { tag: "永恒寻找者 · 深度反省", quote: "我们的心永不安息，直到安息于你。", work: "《忏悔录》", color: "#E8A040", colorName: "烛火橙", career: "适合神学、心理、精神导师。一生都在帮人理解“人到底要什么”。", soul: "“归乡者”。一生寻找“归属”。试过激情、知识、声望，总发现“不是这个”。", weakness: "渴望强烈，易把“像答案”的东西当答案。容易沉迷、神化，发现不完美时又失望。", prescription: ["把“寻找”换成“建设”。", "区分“渴望”和“逃避”。", "安息于自己内心，非外部。"], books: ["《忏悔录》", "《回归》"] },
+  "孔子": { tag: "秩序守护者 · 善于教化", quote: "己所不欲，勿施于人。", work: "《论语》", color: "#8B6B4F", colorName: "礼器褐", career: "适合教育、管理、传统文化。你是“秩序守护者”。", soul: "秩序守护者。相信世界变好是“克己复礼”。重视传统不守旧，重视规矩不僵化。", weakness: "把秩序维持太好，身边人习惯依赖，忘了你的疲惫。“克己”太久，偶尔也想问：那我呢？", prescription: ["每周做件“不合礼”的小事。", "己所欲，亦勿强加于人。", "七十岁才从心所欲，慢慢来。"], books: ["《论语》", "《大学》"] },
+  "孟子": { tag: "坚信善良 · 唤醒者", quote: "人皆有不忍人之心。", work: "《孟子》", color: "#6FAF6B", colorName: "春芽绿", career: "适合教育、公益、心理。你是“点燃者”。", soul: "相信人性本善。内心有不灭火，坚信再坏的人也有柔软处。有“拯救者”本能。", weakness: "对“恶”免疫力不高。面对真正的恶会受巨大冲击。拯救者情结易被消耗。", prescription: ["接受善恶可能同时为真。", "把“拯救”换成“陪伴”。", "穷则独善其身，先救自己。"], books: ["《孟子》", "《活出生命的意义》"] },
+  "荀子": { tag: "现实主义者 · 制度信仰", quote: "人之性恶，其善者伪也。", work: "《荀子》", color: "#4A4A4A", colorName: "墨石黑", career: "适合法律、政策、制度设计。你是“制度派”。", soul: "现实主义者。对“性善”冷眼，重视“教育”和“规则”。相信好制度让坏人变好。", weakness: "现实感太强，错过“例外”。重规则有时忽略个体温度和复杂性。", prescription: ["找三个“打破规则却依然好”的例子。", "区分“现实”和“悲观”。", "“伪”是被塑造的美。"], books: ["《荀子》", "《公正》"] },
+  "老子": { tag: "柔韧如水 · 不争的智慧", quote: "道可道，非常道。", work: "《道德经》", color: "#4A7A8C", colorName: "水蓝", career: "适合战略、作家、冥想导师。你是“以退为进”的人。", soul: "相信最强大力量是“不争”。有罕见耐心，像水知道流向低处。在所有人抢时选择后退。", weakness: "“不争”易被误解为“不求”。在需主动出击时可能错过。太信任自然发生。", prescription: ["每月做一次“主动争取”实验。", "区分“顺应”和“被动”。", "老子不争，但他“有言”。"], books: ["《道德经》", "《薄伽梵歌》"] },
+  "庄子": { tag: "逍遥派 · 自由不羁", quote: "子非鱼，安知鱼之乐？", work: "《庄子》", color: "#4B8B9B", colorName: "蝶翼青", career: "适合自由创作、旅行、艺术。你是天生的“游”者。", soul: "天生逍遥者。不在意世俗成功，不被“应该”绑架。生命最高境界是“游”。", weakness: "逍遥有时是“不介入”。太擅长“看开”，错过“在意”的深度。", prescription: ["为某件事“不逍遥”一次。", "区分“看开”和“回避”。", "鼓盆而歌唱的是歌，不是冷漠。"], books: ["《庄子》", "《禅与摩托车维修艺术》"] },
+  "韩非子": { tag: "冷峻洞察 · 制度至上", quote: "刑过不避大臣，赏善不遗匹夫。", work: "《韩非子》", color: "#2D2D2D", colorName: "玄铁黑", career: "适合法律、审计、内控、策略。你是“系统清醒者”。", soul: "对“权力”和“人性”有冷峻洞察。不信道德感化，信“利害”驱动。思维像手术刀。", weakness: "冷峻洞察难被欺骗，也难被温暖。太清楚算计，当有人无条件好时第一反应是怀疑。", prescription: ["每周做件“不基于利害”的事。", "给一个人无条件信任一次。", "清醒的人往往最孤独。"], books: ["《韩非子》", "《君主论》"] },
+  "王阳明": { tag: "知行合一 · 行动派", quote: "致良知。", work: "《传习录》", color: "#C0392B", colorName: "知行红", career: "适合创业、行动管理、教育。你是“先干起来”的人。", soul: "“行动派的心学家”。不信真理在书里，信在心里被“知行合一”活出来。厌恶空谈。", weakness: "“知行合一”有时让“知”跟不上“行”。太急于行动，可能没充分理解就冲出去。", prescription: ["做之前多停三秒。", "区分“良知直觉”和“习惯本能”。", "龙场悟道前也有漫长沉默。"], books: ["《传习录》", "《干法》"] },
+  "朱熹": { tag: "系统构建者 · 求知狂", quote: "存天理，灭人欲。", work: "《四书章句集注》", color: "#B8956A", colorName: "竹简棕", career: "适合学术、图书馆、教育、出版。你是“搭建知识体系”的天才。", soul: "“格物穷理”的人。相信规律可被认识。对知识有虔诚尊重，严谨、系统、勤奋。", weakness: "“格物”太多，忘了“格心”。“存天理”太好，“灭人欲”太彻底，活成精密系统。", prescription: ["做件“毫无理由”的事。", "把一本书“不批注”地读一遍。", "他的爱，藏在克制里。"], books: ["《四书章句集注》", "《如何阅读一本书》"] },
+  "慧能": { tag: "通透 · 不着相", quote: "本来无一物，何处惹尘埃。", work: "《六祖坛经》", color: "#F0F0F0", colorName: "空性白", career: "适合禅修、写作、艺术、极简。你是“不着相”的人。", soul: "天生空性者。有“不着相”能力，不看表面，不在乎标签。相信直指人心。", weakness: "“空”有时让你显“冷”。不执着，也难“炽热”。太擅长“不惹尘埃”，错过快乐。", prescription: ["刻意“着相”一次。", "区分“空性”和“疏离”。", "重点不是“无所住”，是“生其心”。"], books: ["《六祖坛经》", "《活在此时此刻》"] },
+  "张载": { tag: "使命感驱动 · 宏大叙事者", quote: "为天地立心，为生民立命。", work: "《正蒙》", color: "#6B6B6B", colorName: "山脊灰", career: "适合社会企业、公共政策、公益。你是“有使命感的人”。", soul: "有“使命感”。难忍受庸碌，觉得应做点“配得上活着”的事。理想很大，脚踩在地上。", weakness: "“为万世”是巨大目标，既是燃料也是枷锁。理想太高远，易觉“不够好”。", prescription: ["把“为万世”改成“为一世”。", "在“为生民”里加上“为自己”。", "理想现实从不相悖。"], books: ["《正蒙》", "《曾国藩传》"] },
+  "周敦颐": { tag: "底层逻辑者 · 整体性思维", quote: "无极而太极。", work: "《太极图说》", color: "#1A1A1A", colorName: "太极黑", career: "适合基础科学、哲学、理论物理。你是“第一性原理”思考者。", soul: "在纷繁中看到“一”。相信万物背后有统一原理。不喜欢碎片，喜欢追问“根本上是什么”。", weakness: "太关心“一”，忽略“多”的价值。试图统一所有，但矛盾、冲突也是真实的一部分。", prescription: ["尝试不“整合”，让矛盾共存。", "深度观察小事物，不找规律。", "他也感受一株草的生机。"], books: ["《太极图说》", "《万物简史》"] },
+  "康德": { tag: "极度自律 · 理性至上", quote: "头顶的星空，心中的道德律。", work: "《纯粹理性批判》", color: "#3D2A54", colorName: "暮紫", career: "适合法律、学术、审计、数据。你的价值是“校准”。", soul: "依赖秩序，为不被混沌吞没。信理性是可靠工具，也知有边界。活在自律中，出于尊重。", weakness: "太信“应该”，忘了“实际”。世界不按逻辑运行时深刻失望。易把“自律”误当“自虐”。", prescription: ["允许偶尔“不讲道理”享受。", "道德律令从“必须”调为“可以”。", "星空美，草地也有温度。"], books: ["《纯粹理性批判》", "《小王子》"] },
+  "尼采": { tag: "反叛者 · 生命力旺盛", quote: "那些杀不死我的，使我更强大。", work: "《查拉图斯特拉如是说》", color: "#F4C430", colorName: "雷霆黄", career: "适合创业、艺术、思想写作。你是“重估一切价值”的人。", soul: "体内有团火。对平庸生理性反感。信生命本质是“权力意志”——成为自己最极致版本。", weakness: "强大建立在危险假设上：永远有力量面对打击。当某些东西真“杀死”你时，可能没那么强大。", prescription: ["改成“有些东西杀不死我，但让我休息”。", "为“脆弱”保留房间。", "他抱马时是心痛的人。"], books: ["《查拉图斯特拉如是说》", "《当尼采哭泣》"] },
+  "叔本华": { tag: "诚实悲观 · 洞察极深", quote: "人生如钟摆，在痛苦与无聊之间。", work: "《人生的智慧》", color: "#B0B0B0", colorName: "薄雾灰", career: "适合哲学、心理、艺术批评。你是“看透却依然在场”的角色。", soul: "目光带层薄灰。不信“未来会更好”。早看穿追逐欲望是痛苦，满足是无聊。只是早接受“这就是人生”。", weakness: "“看透”少了很多失望，也少了很多惊喜。提前知道结果，不愿投入过程。", prescription: ["用艺术调节悲观。", "尝试一次“非理性”行动。", "悲观主义者也需要活物来爱。"], books: ["《作为意志和表象的世界》", "《人生的智慧》"] },
+  "海德格尔": { tag: "存在敏感 · 常常“出神”", quote: "人是被抛入世界的。", work: "《存在与时间》", color: "#2D4F3C", colorName: "森林绿", career: "适合哲学、存在心理、文学。需允许你停下问“为什么”的空间。", soul: "从小隐隐觉得“不对劲”。无法理所当然活着，总追问“活着意味什么”。直面“存在”本身。", weakness: "“向死而生”是诚实，但也难“活在当下”。总在观看自己活着，而非真正在活。", prescription: ["把“存在追问”放一边，今天只是“在”。", "做“不需反思”的事。", "他也感受林间的风。"], books: ["《存在与时间》", "《当尼采哭泣》"] },
+  "萨特": { tag: "极度自由 · 为自己负责", quote: "人是自由的，人注定自由。", work: "《存在与虚无》", color: "#C41E3A", colorName: "存在红", career: "适合创业、创作、自由职业。需能让你“说了算”的空间。", soul: "拒绝任何“借口”。信你是什么，是选择的结果。自由是荣耀也是负担。每次选择都感到重量。", weakness: "自由是“孤独的自由”。拒绝托付、依赖。把自己活成孤岛。自由以“被抛弃”为代价。", prescription: ["尝试一次“不自由”的选择。", "区分“自由”和“孤立”。", "自由的重量也是可以分享的。"], books: ["《存在与虚无》", "《西西弗斯神话》"] },
+  "加缪": { tag: "觉醒者 · 坚韧不放弃", quote: "我们必须想象西西弗斯是幸福的。", work: "《西西弗斯神话》", color: "#1A6B8A", colorName: "地中海蓝", career: "适合“明知难但依然在做”的领域。你是“荒谬英雄”。", soul: "“明知无望但依然前行”。看见荒谬，但选择继续推石头。反抗不是胜利，是“继续”本身。", weakness: "“荒谬英雄”人设很酷，但很累。一直推石头，忘了问：可不可以休息一下？", prescription: ["给石头放一天假。", "区分“反抗”和“执念”。", "答案不是死亡，是活着。"], books: ["《西西弗斯神话》", "《局外人》"] },
+  "福柯": { tag: "批判者 · 拆穿伪装", quote: "知识即权力。", work: "《规训与惩罚》", color: "#D0D0D0", colorName: "镜面银", career: "适合学术批判、媒体、法律、社会研究。你是“体制的眼睛”。", soul: "对“理所当然”警惕。追问“谁定义的？为了谁？”信世界是被构建、被权力塑造的。", weakness: "拆穿了一切，住在哪里？不信任何结构，如何安放自己？锋利的刀不能当床睡。", prescription: ["找件“不值得批判”的事让它存在。", "参与具体社群感受归属。", "身体比权力更真实。"], books: ["《规训与惩罚》", "《疯癫与文明》"] },
+  "德里达": { tag: "语言敏感 · 优雅的怀疑者", quote: "文本之外，别无他物。", work: "《书写与差异》", color: "linear-gradient(135deg, #ff9a9e, #fad0c4, #a1c4fd)", colorName: "棱镜彩", career: "适合翻译、文化研究、创意写作。你是“意义拆解者”。", soul: "信一切在“被解读”。对“终极真相”优雅怀疑。擅长拆解二元对立，让它们露出裂缝。", weakness: "解构能力让你难“站稳”。总看见另一面，无法果断选择。过度解构让行动不可能。", prescription: ["某些事禁止“解构”，直接说“我信”。", "区分“语言局限”和“存在实在”。", "解构是重新打开可能。"], books: ["《书写与差异》", "《为什么读经典》"] },
+  "罗素": { tag: "理性有温度 · 清晰表达者", quote: "三种激情支配了我的一生：爱、知识、同情。", work: "《西方哲学史》", color: "#E8C84A", colorName: "晨光金", career: "适合教育、写作、演讲、社会活动。你是“受欢迎的聪明人”。", soul: "有“温度”的理性主义者。喜欢清晰逻辑，但不冷冰冰。关心苦难，关心爱。头脑和心是连接的。", weakness: "“三种激情”可能让你“太分散”。什么都想关心，可能哪件都没投入足够深。", prescription: ["在“三种激情”里选一个给更多时间。", "允许自己“不关注”某些事。", "带着枷锁舞蹈。"], books: ["《西方哲学史》", "《幸福之路》"] },
+  "维特根斯坦": { tag: "极度诚实 · 语言洁癖", quote: "凡不可言说者，必须保持沉默。", work: "《逻辑哲学论》", color: "#F8F8F8", colorName: "沉默白", career: "适合逻辑、编程、哲学、翻译。你是“语言清洁工”。", soul: "对语言有近乎洁癖的诚实。不说没把握的话。沉默不是无话可说，是太在意“准确”。", weakness: "沉默保护了诚实，也错过“不精确但温暖”的时刻。坚持不可言说就沉默，可能把珍贵体验也沉默掉。", prescription: ["尝试一次“不精确的表达”。", "在“沉默”和“试着说”间选后者。", "他度过了美好的一生。"], books: ["《逻辑哲学论》", "《维特根斯坦传》"] },
+  "克尔凯郭尔": { tag: "极度内省者 · 焦虑但清醒", quote: "焦虑是自由的眩晕。", work: "《恐惧与颤栗》", color: "#A8A8A8", colorName: "黎明灰", career: "适合文学、存在心理、哲学。你是“内心世界的剧作家”。", soul: "“内心世界的剧作家”。大量内在对话、自我怀疑。对“选择”有疼痛的敏感。焦虑是对“自由”的诚实回应。", weakness: "“无限反思”让你卡住。永远在审视、准备。焦虑是自由的眩晕，但一直眩晕就无法迈出那步。", prescription: ["给每个决定截止时间。", "区分“深思熟虑”和“无限循环”。", "有时候你需要跳。"], books: ["《恐惧与颤栗》", "《致死的疾病》"] },
+  "胡塞尔": { tag: "耐心观察 · 回到源头", quote: "回到事物本身。", work: "《逻辑研究》", color: "#E8F0F0", colorName: "透明冰", career: "适合科研、教育、哲学。你是“不带预设的观看者”。", soul: "“悬置判断”的人。不易接受“大家都这么说”，需亲自验证。对“先入为主”有警惕。", weakness: "“回到事物本身”需很多时间。可能因“悬置”花太多时间，错过行动时机。", prescription: ["对不重要决定使用“现成判断”。", "区分“新鲜观看”和“无效固执”。", "还原是方法，非停在原地。"], books: ["《逻辑研究》", "《观看之道》"] },
+  "弗洛伊德": { tag: "深挖动机 · 自我探索者", quote: "梦是愿望的满足。", work: "《梦的解析》", color: "#1C2E4A", colorName: "梦夜蓝", career: "适合心理、精神分析、HR、艺术治疗。你是“潜意识翻译者”。", soul: "信一切有“底下原因”。说漏的嘴、梦都不是巧合。对自己有“考古学家式”好奇。", weakness: "“考古学”没终点。易陷入“无限追溯”。有些东西不需挖掘，只需接受。", prescription: ["停止一次“挖掘”，只感受。", "接受“有些冲动没深层原因”。", "有时雪茄只是雪茄。"], books: ["《梦的解析》", "《日常生活的精神病理学》"] },
+  "荣格": { tag: "象征敏感 · 原型思维", quote: "直到你让潜意识成为意识，它将主导你的生活。", work: "《红书》", color: "#6B3FA0", colorName: "神秘紫", career: "适合心理、艺术、神话、塔罗、个人成长。你是“象征解读者”。", soul: "信“个人”外还有“集体”。对神话、梦境、象征有天然亲近。人生有“寻宝”质感。", weakness: "对“象征”敏感，有时脱离“现实”。太关心“意味什么”，忽略“这到底是什么”。", prescription: ["把“象征”放回“事物本身”。", "追求个体化时，记得和真实个体接触。", "成为完整的人，非完美。"], books: ["《红书》", "《千面英雄》"] },
+  "纪伯伦": { tag: "温柔有力量 · 天生倾听者", quote: "你的孩子不是你的孩子。", work: "《先知》", color: "#C68E3C", colorName: "琥珀金", career: "适合心理、写作、艺术治疗。你是“语言的天平”。", soul: "语言有重量。用诗意眼睛看世界。对人类怀有不带占有欲的爱。靠活出来的轻盈和通透引路。", weakness: "用诗意解读世界，有时把残酷翻译太柔和。不擅长愤怒、拒绝、说“不”。", prescription: ["先把自己的杯子斟满。", "练习“不温柔的诚实”。", "把诗意收回书写自己。"], books: ["《先知》", "《当尼采哭泣》"] },
+  "泰戈尔": { tag: "温柔直觉派 · 相信美好", quote: "世界对着它的爱人，揭下了浩瀚的面具。", work: "《飞鸟集》", color: "#E8D5D0", colorName: "晨雾粉", career: "适合教育、自然疗愈、艺术、儿童。你是“让一切变得柔和”的人。", soul: "用“美”理解世界。有惊人直觉，在一花一叶中看见宇宙。见过黑暗，但选择相信深处藏着光。", weakness: "柔软易被误解为软弱。世界用坚硬回应时，受伤害比预期大。易把别人情绪背在自己身上。", prescription: ["每天留段“不用回应任何人”的时间。", "把“世界变好”换成“让身边小角落变好”。", "练习说“我不同意”。"], books: ["《飞鸟集》", "《活山》"] },
+  "鲁米": { tag: "炽热地爱 · 不设防", quote: "你生而有翼，为何却要爬行？", work: "《在春天走进果园》", color: "#D43D4A", colorName: "爱焰红", career: "适合亲密关系、诗歌、舞蹈、灵性。你是“爱的管道”。", soul: "信爱是通往一切的钥匙。有过“爱的觉醒”，从“活在头脑”变成“活在心里”。存在本身是邀请。", weakness: "“不设防”易受伤。爱敞开，伤害直接落在皮肤上。可能一次次被辜负，又一次次重新选择爱。", prescription: ["区分“无条件爱”和“无边界给予”。", "给出前问“能量够吗”。", "伤口是光进入的地方，但也需包扎。"], books: ["《在春天走进果园》", "《爱的艺术》"] },
+  "里尔克": { tag: "极度耐心 · 深度沉思", quote: "学习去爱问题本身。", work: "《给一个青年诗人的信》", color: "#F5E6D3", colorName: "烛火白", career: "适合写作、艺术、深度研究。你是“酝酿者”。", soul: "“在黑暗中生长”的人。不急于找答案。相信困惑、延迟、不确定本身有意义。和问题共处。", weakness: "“耐心”易被误解为“拖延”。“爱问题”太久，可能错过“答案出现”时刻。有些问题用来解决。", prescription: ["给问题设定“解决期限”。", "区分“沉思”和“逃避”。", "去书写、体验、成为创作者。"], books: ["《给一个青年诗人的信》", "《里尔克诗选》"] },
+  "博尔赫斯": { tag: "迷宫漫游者 · 相信可能性", quote: "天堂应该是图书馆的模样。", work: "《小径分岔的花园》", color: "#8B7355", colorName: "旧书褐", career: "适合写作、编辑、翻译、图书馆。你是“迷宫创造者”。", soul: "“迷宫漫游者”。喜欢绕弯的东西。对“确定”不感兴趣，对“可能性”着迷。世界是永远在读的书。", weakness: "对“可能”迷恋，难停留在“现实”。爱迷宫不是出口。可能在关系中保持“可进可退”。", prescription: ["选一条路走到底。", "在“无限延伸”和“停在一点”间选后者。", "上帝给了书籍和黑暗。"], books: ["《小径分岔的花园》", "《沙之书》"] },
+  "黑塞": { tag: "分裂但渴望统一 · 深刻自省", quote: "每个人的内心深处都有一匹荒原狼。", work: "《荒原狼》", color: "#6A6A6A", colorName: "荒原灰", career: "适合小说、艺术治疗、跨文化。你是“内在和解者”。", soul: "身上有“狼”和“人”的战争。一面渴望融入，一面渴望野性。夹在两者间，一生是和解之路。", weakness: "“分裂”是最深痛苦，也是创造力来源。可能太习惯分裂，放弃“真正连接”的可能。", prescription: ["每周做件“纯狼”的事。", "也做件“纯人”的事。", "学会玩这场人生游戏，不是赢。"], books: ["《荒原狼》", "《德米安》"] },
+  "阿伦特": { tag: "独立判断 · 不可收编", quote: "恶的平庸性，比恶本身更令人恐惧。", work: "《耶路撒冷的艾希曼》", color: "#F2F2F2", colorName: "独立白", career: "适合新闻、政治、法律、社会批判。你是“不可收编者”。", soul: "“不可收编”的人。不属于任何阵营。信思考是唯一抵抗——拒绝停止思考。对“人云亦云”深刻警惕。", weakness: "“不可收编”保持清醒，也难“放松归属”。永远在观察、评估、保持距离。很少完全信任群体。", prescription: ["找个可“不完全同意但依然属于”的社群。", "区分“独立思考”和“孤僻”。", "关心普通人如何不变成那样。"], books: ["《耶路撒冷的艾希曼》", "《人的境况》"] },
+  "波伏娃": { tag: "反叛标签 · 自我创造", quote: "女人不是天生的，而是被塑造的。", work: "《第二性》", color: "#D44A5A", colorName: "女力红", career: "适合女性研究、文学、社会活动、教育。你是“自我创造者”。", soul: "拒绝“被定义”。对标签保持怀疑。信人是在选择中成为自己的。一生是不断“超越既定”。", weakness: "“拒绝被定义”强大，但有时也需“定义”歇脚。害怕被框住，从不入框，但框也是保护。", prescription: ["选个“临时定义”住三个月。", "区分“被定义”和“自我定义”。", "关系不需被定义也可存在。"], books: ["《第二性》", "《女宾》"] },
+  "阿多诺": { tag: "不妥协的清醒 · 拒绝鸡汤", quote: "在错误的生活中，没有正确的生活。", work: "《否定的辩证法》", color: "#4A4A4A", colorName: "批判灰", career: "适合文艺批评、社会研究、哲学、音乐批评。你是“不被收买的清醒者”。", soul: "对“虚假和谐”极强过敏。受不了鸡汤和集体叙事。信在不公正世界，“过得好”需被审视。", weakness: "“不妥协”高贵但累。一直站在“错误”对立面，有没有“属于自己的正确”？批判让你有“不”，但不够清楚“要”什么。", prescription: ["从“批判错误”转向“创造微小正确”。", "区分“保持清醒”和“拒绝快乐”。", "错误音乐中也有正确音符。"], books: ["《否定的辩证法》", "《美学理论》"] },
+  "马尔库塞": { tag: "保持警惕 · 质疑幸福叙事", quote: "发达工业社会是一个极权社会——以‘舒适’收买了反抗。", work: "《单向度的人》", color: "#E8962E", colorName: "警惕橙", career: "适合社会研究、消费者权益、文化批评、教育。你是“不被收买的满足者”。", soul: "对“舒服”警惕。不信任“让你轻松”的东西。物质条件好后依然不安，怀疑“幸福”是被设计的。", weakness: "“不满足”保持批判力，也难真正休息。不允许被“收买”，一直站在所有“快乐”外面。", prescription: ["允许自己被“收买”一次。", "区分“被收买的快乐”和“真实快乐”。", "“拒绝”之后应是“重建”。"], books: ["《单向度的人》", "《消费社会》"] },
+  "本雅明": { tag: "灵光敏感 · 独一无二守护者", quote: "即使是最完美的复制品，也缺少灵光。", work: "《机械复制时代的艺术作品》", color: "#D4AF37", colorName: "灵光金", career: "适合收藏、策展、写作、摄影、文化研究。你是“灵光守护者”。", soul: "“灵光守护者”。对“独一无二”有执念。信每样事物都有“此时此地”，不可复制。", weakness: "“灵光”执念难享受“复制品”便利。拒绝电子书、流媒体。守护是美的，但可能错过复制中的灵光。", prescription: ["尝试喜欢一件“复制品”。", "把“灵光”从“物品”扩展到“体验”。", "他是碎片的收集者。"], books: ["《机械复制时代的艺术作品》", "《单向街》"] },
+  "塔可夫斯基": { tag: "时间敏感 · 慢的勇气", quote: "艺术是祈祷的一种形式。", work: "《雕刻时光》", color: "#4A5A4A", colorName: "雕刻时光", career: "适合电影、写作、摄影、音乐。你是“慢的朝圣者”。", soul: "“慢的朝圣者”。对时间有电影般敏感。信好东西需时间沉淀。会反复看一部电影、走同一条路。", weakness: "“慢”在快节奏世界是奢侈也是隔离。可能因“不够快”错过机会。深度是宝藏，也可能错过“宽度”。", prescription: ["偶尔“快”一次。", "把“雕刻时光”改成“经过时光”。", "它在讲时间，也讲时间中的我们。"], books: ["《雕刻时光》", "《七部半》"] }
+};
+
+// ==========================================
+// 4. 核心算法：数学归一化与余弦计算
 // ==========================================
 const DIMENSION_KEYS = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8'];
 
-// 计算用户初始累加向量
 function calculateRawVector(answers) {
     let raw = { D1: 0, D2: 0, D3: 0, D4: 0, D5: 0, D6: 0, D7: 0, D8: 0 };
     for (let qId in answers) {
@@ -242,7 +204,6 @@ function calculateRawVector(answers) {
     return raw;
 }
 
-// 归一化：将任意区间的得分映射到 [0, 10] (防止负数破坏余弦计算，并与目标空间对齐)
 function normalizeVector(rawVector) {
     let normalized = {};
     let values = Object.values(rawVector);
@@ -251,26 +212,24 @@ function normalizeVector(rawVector) {
     
     for (let dim of DIMENSION_KEYS) {
         if (maxScore === minScore) {
-            normalized[dim] = 5; // 如果极度平均，赋中值
+            normalized[dim] = 5;
         } else {
-            // 将分数线性映射到 0~10 的雷达刻度
             normalized[dim] = ((rawVector[dim] - minScore) / (maxScore - minScore)) * 10;
         }
     }
     return normalized;
 }
 
-// 标准余弦相似度计算 (加权计算)
 function cosineSimilarity(vecA, vecB) {
     let dot = 0, normA = 0, normB = 0;
-    // 保留细微权重倾斜，增强匹配准确度
     const weights = { D1: 1.2, D2: 1.0, D3: 0.9, D4: 1.2, D5: 1.0, D6: 1.1, D7: 1.0, D8: 0.9 };
     
-    for (let d of DIMENSION_KEYS) {
+    for (let i = 0; i < DIMENSION_KEYS.length; i++) {
+        let d = DIMENSION_KEYS[i];
         let w = weights[d];
-        dot += w * vecA[d] * vecB[d];
-        normA += w * Math.pow(vecA[d], 2);
-        normB += w * Math.pow(vecB[d], 2);
+        dot += w * vecA[i] * vecB[i];
+        normA += w * Math.pow(vecA[i], 2);
+        normB += w * Math.pow(vecB[i], 2);
     }
     if (normA === 0 || normB === 0) return 0;
     return dot / (Math.sqrt(normA) * Math.sqrt(normB));
@@ -279,21 +238,19 @@ function cosineSimilarity(vecA, vecB) {
 function getFinalResult(answers) {
     let rawVector = calculateRawVector(answers);
     let finalUserVector = normalizeVector(rawVector);
+    let userArray = DIMENSION_KEYS.map(k => finalUserVector[k]);
     let scores = [];
     
     for (let name in PHILOSOPHER_VECTORS) {
-        let sim = cosineSimilarity(finalUserVector, PHILOSOPHER_VECTORS[name]);
+        let sim = cosineSimilarity(userArray, PHILOSOPHER_VECTORS[name]);
         scores.push({ name: name, score: sim });
     }
     scores.sort((a, b) => b.score - a.score);
-    return {
-        bestMatch: scores[0],
-        userVector: finalUserVector
-    };
+    return { bestMatch: scores[0], userVector: finalUserVector };
 }
 
 // ==========================================
-// 4. UI 渲染与状态管理
+// 5. UI 渲染与状态管理
 // ==========================================
 const appDiv = document.getElementById('app');
 let currentStep = 'welcome';
@@ -306,8 +263,8 @@ function render() {
         appDiv.innerHTML = `
             <div class="card">
                 <h1 class="title">50位思想家：寻找你的精神镜像</h1>
-                <p class="subtitle">基于多维余弦映射算法，建立你的思想坐标系。</p>
-                <button class="primary-btn" onclick="startQuiz()">进入测试</button>
+                <p class="subtitle">基于多维余弦映射算法，建立你的思想坐标系。<br>25道深度追问，匹配属于你的灵魂底色。</p>
+                <button class="btn" onclick="startQuiz()">进入测试</button>
             </div>
         `;
     } else if (currentStep === 'quiz') {
@@ -333,28 +290,64 @@ function render() {
         let meta = PHILOSOPHER_META[match.name];
         let similarity = (match.score * 100).toFixed(1);
         
+        // 动态改变背景色
+        if(meta.color.includes('gradient')) {
+            document.body.style.background = meta.color;
+            document.body.style.color = '#1a1a1a';
+        } else {
+            document.body.style.backgroundColor = meta.color;
+            const hex = meta.color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            document.body.style.color = brightness > 150 ? '#1a1a1a' : '#f0f0f0';
+        }
+
         appDiv.innerHTML = `
             <div class="card">
-                <div class="result-tag">灵魂匹配度：${similarity}%</div>
-                <h1 class="title">${match.name}</h1>
-                <p class="subtitle" style="margin-bottom: 10px;">「 ${meta.tag} 」</p>
+                <div class="result-tag">灵魂匹配度</div>
+                <div class="match-score">${similarity}%</div>
+                <div class="thinker-name">${match.name}</div>
+                <div class="thinker-tag">「 ${meta.tag} 」</div>
+                <div style="text-align:center;"><span class="color-badge" style="background:${meta.color}; color:${document.body.style.color === 'rgb(26, 26, 26)' ? '#1a1a1a' : '#fff'}">${meta.colorName} ${meta.color.includes('gradient')?'':meta.color}</span></div>
                 
-                <div class="quote">${meta.quote}</div>
+                <div class="quote">“${meta.quote}”</div>
                 
-                <div class="meta-info">
-                    <div class="meta-item"><span class="meta-label">代表作</span><span class="meta-value">${meta.work}</span></div>
-                </div>
-
                 <div class="chart-container">
                     <canvas id="radarChart"></canvas>
                 </div>
+
+                <div class="section">
+                    <div class="section-title">人生规划</div>
+                    <div class="section-content">${meta.career}</div>
+                </div>
                 
-                <button class="primary-btn" onclick="restart()">重新测算</button>
+                <div class="section">
+                    <div class="section-title">灵魂素描</div>
+                    <div class="section-content">${meta.soul}</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">隐秘软肋</div>
+                    <div class="section-content">${meta.weakness}</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">存在处方</div>
+                    ${meta.prescription.map(p => `<div class="list-item">${p}</div>`).join('')}
+                </div>
+
+                <div class="section">
+                    <div class="section-title">精神食粮</div>
+                    ${meta.books.map(b => `<div class="list-item">${b}</div>`).join('')}
+                </div>
+                
+                <button class="btn" onclick="restart()">重新测算</button>
             </div>
         `;
         
-        // 渲染雷达图
-        setTimeout(() => drawRadarChart(vector), 50);
+        setTimeout(() => drawRadarChart(vector), 100);
     }
 }
 
@@ -362,19 +355,22 @@ function drawRadarChart(vector) {
     const ctx = document.getElementById('radarChart').getContext('2d');
     if (myChart) myChart.destroy();
     
+    const isDark = document.body.style.color === 'rgb(240, 240, 240)' || document.body.style.color === '#f0f0f0';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const textColor = isDark ? '#ccc' : '#555';
+    const lineColor = isDark ? 'rgba(255, 255, 255, 0.8)' : 'rgba(34, 34, 34, 0.8)';
+    
     myChart = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['理性(D1)', '理想(D2)', '行动(D3)', '个体(D4)', '情感(D5)', '批判(D6)', '存在(D7)', '共情(D8)'],
+            labels: ['理性', '理想', '行动', '个体', '情感', '批判', '存在', '共情'],
             datasets: [{
                 label: '你的思想坐标',
                 data: [vector.D1, vector.D2, vector.D3, vector.D4, vector.D5, vector.D6, vector.D7, vector.D8],
-                backgroundColor: 'rgba(34, 34, 34, 0.1)',
-                borderColor: 'rgba(34, 34, 34, 1)',
-                pointBackgroundColor: 'rgba(34, 34, 34, 1)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgba(34, 34, 34, 1)',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(34, 34, 34, 0.1)',
+                borderColor: lineColor,
+                pointBackgroundColor: lineColor,
+                pointBorderColor: isDark ? '#1a1a1a' : '#fff',
                 borderWidth: 2,
             }]
         },
@@ -383,15 +379,15 @@ function drawRadarChart(vector) {
             maintainAspectRatio: false,
             scales: {
                 r: {
-                    angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
-                    grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                    pointLabels: { font: { size: 12, family: 'Helvetica Neue' }, color: '#555' },
+                    angleLines: { color: gridColor },
+                    grid: { color: gridColor },
+                    pointLabels: { font: { size: 12, weight: 'bold' }, color: textColor },
                     ticks: { display: false, min: 0, max: 10, stepSize: 2 }
                 }
             },
             plugins: {
                 legend: { display: false },
-                tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10 }
+                tooltip: { backgroundColor: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)', titleColor: isDark ? '#1a1a1a' : '#fff', bodyColor: isDark ? '#1a1a1a' : '#fff' }
             }
         }
     });
@@ -416,13 +412,14 @@ function selectAnswer(qId, choiceKey) {
 }
 
 function restart() {
+    document.body.style.backgroundColor = '#1a1a1a';
+    document.body.style.color = '#f0f0f0';
     currentStep = 'welcome';
     render();
 }
 
-// 初始加载
+// 初始化
 render();
-
 </script>
 </body>
 </html>
